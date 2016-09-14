@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">VolumeManager</string>
+    <string-array name="volume_type">
+        <item>alarm</item>
+        <item>music</item>
+        <item>call</item>
+        <item>ring</item>
+    </string-array>
+</resources>
