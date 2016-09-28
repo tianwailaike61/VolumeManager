@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">音量管理</string>
+    <string-array name="volume_type">
+        <item>通话</item>
+        <item>系统</item>
+        <item>铃声</item>
+        <item>媒体</item>
+        <item>闹钟</item>
+        <item>通知</item>
+        <item>bluetooth_call</item>
+        <item>system_enforced</item>
+        <item>DTMF</item>
+        <item>TTS</item>
+    </string-array>
+
+    <string name="follow_system">跟随系统</string>
+
+    <string name="loadmore">加载中。。。</string>
+
+    <!-- WindowChangeDetectingService String -->
+    <string name="accessibility_service_description">accessibility_service_description</string>
+    <string name="accessibility_service_name">音量管理服务</string>
+    <string name="title_activity_volume">VolumeActivity</string>
+    <string name="title_activity_settings">设置</string>
+
+    <!-- menu String-->
+    <string name="menu_settings">设置</string>
+    <string name="menu_change_recycler_layoutmanager">切换布局</string>
+    <string name="menu_about_us">关于我们</string>
+
+    <!-- Snackbar String -->
+    <string name="snackbar_setting">设置</string>
+    <string name="snackbar_messege">请在设置中开启服务！</string>
+
+</resources>

@@ -1,4 +1,4 @@
-package com.jianghongkui.volumemanager;
+package com.jianghongkui.volumemanager.other;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

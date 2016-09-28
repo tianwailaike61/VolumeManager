@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:orientation="horizontal">-->
+
+    <!--<ImageView-->
+    <!--android:id="@+id/appIcon"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content" />-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/appName"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent" />-->
+
+    <!--</LinearLayout>-->
+
+    <include
+        layout="@layout/item_program_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:id="@+id/volumegroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:orientation="horizontal"
+        android:weightSum="6">
+
+        <com.jianghongkui.volumemanager.VolumeView
+            android:id="@+id/volume_view_call"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/seekbar_heigh"
+            android:layout_weight="1" />
+
+        <com.jianghongkui.volumemanager.VolumeView
+            android:id="@+id/volume_view_system"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/seekbar_heigh"
+            android:layout_weight="1" />
+
+        <com.jianghongkui.volumemanager.VolumeView
+            android:id="@+id/volume_view_ring"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/seekbar_heigh"
+            android:layout_weight="1" />
+
+        <com.jianghongkui.volumemanager.VolumeView
+            android:id="@+id/volume_view_music"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/seekbar_heigh"
+            android:layout_weight="1" />
+
+        <com.jianghongkui.volumemanager.VolumeView
+            android:id="@+id/volume_view_alarm"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/seekbar_heigh"
+            android:layout_weight="1" />
+        <com.jianghongkui.volumemanager.VolumeView
+            android:id="@+id/volume_view_notification"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/seekbar_heigh"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <android.support.v7.widget.AppCompatCheckBox
+        android:id="@+id/follow_system"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="@string/follow_system" />
+
+
+</LinearLayout>

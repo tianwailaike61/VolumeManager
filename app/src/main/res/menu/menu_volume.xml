@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_settings"
+        android:orderInCategory="1"
+        android:title="@string/menu_settings" />
+    <!--<item-->
+        <!--android:id="@+id/change_recycler_layoutmanager"-->
+        <!--android:orderInCategory="2"-->
+        <!--android:title="@string/menu_change_recycler_layoutmanager" />-->
+    <item
+        android:id="@+id/menu_about_us"
+        android:orderInCategory="3"
+        android:title="@string/menu_about_us" />
+</menu>
