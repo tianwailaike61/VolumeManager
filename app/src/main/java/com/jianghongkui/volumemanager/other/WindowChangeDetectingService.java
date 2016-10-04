@@ -8,12 +8,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 
 import com.jianghongkui.volumemanager.model.Volume;
 import com.jianghongkui.volumemanager.util.MLog;
 import com.jianghongkui.volumemanager.util.Utils;
+import com.jianghongkui.volumemanager.util.VolumeDBManager;
+
+import java.util.List;
 
 /**
  * Created by jianghongkui on 2016/9/21.
@@ -31,6 +35,8 @@ public class WindowChangeDetectingService extends AccessibilityService {
 
     private String currentActivityPackageName;
     private String lastActivityPackageName;
+
+    private VolumeDBManager manager;
 
     private Context context;
 
@@ -78,6 +84,7 @@ public class WindowChangeDetectingService extends AccessibilityService {
 //            if (isActivity) {
 //                currentActivityPackageName = activityInfo.packageName;
             currentActivityPackageName = event.getPackageName().toString();
+            MLog.d(TAG, "currentActivityPackageName：" + currentActivityPackageName + "--lastActivityPackageName:" + lastActivityPackageName);
             if (!currentActivityPackageName.equals(lastActivityPackageName)) {
                 maybeChangeVolume(currentActivityPackageName);
                 lastActivityPackageName = currentActivityPackageName;
@@ -92,16 +99,14 @@ public class WindowChangeDetectingService extends AccessibilityService {
         }
     }
 
+    @Nullable
     private Volume getVolumeFromDatabases(String packageName) {
-        Volume volume = new Volume();
-//        volume.setPackageName(packageName);
-//        int[] values = new int[10];
-//        for (int i = 0; i < values.length; i++) {
-//            values[i] = 10;
-//        }
-//        volume.setValues(values);
-        //TODO get volume from databases
-        return volume;
+        if (manager == null)
+            manager = VolumeDBManager.newInstace(context);
+        List<Volume> volumes = manager.query(packageName);
+        if (volumes != null && volumes.size() != 0)
+            return volumes.get(0);
+        return null;
     }
 
     private void setVolume(Volume volume) {
@@ -111,7 +116,14 @@ public class WindowChangeDetectingService extends AccessibilityService {
             for (int i = 0; i < values.length; i++) {
                 Utils.setVolume(context, i, values[i]);
             }
+        } else {
+            restore();
         }
+    }
+
+    private void restore() {
+        String packageName = Application.PACKAGENAME;
+        setVolume(getVolumeFromDatabases(packageName));
     }
 
     private boolean canChange() {
@@ -130,15 +142,10 @@ public class WindowChangeDetectingService extends AccessibilityService {
         public void onReceive(Context context, Intent intent) {
             MLog.d(TAG, "onReceive:" + intent);
             if (intent.getAction().equals(ACTION_USER_ADJUST_VOLUME)) {
-                //TODO  update the databases
+                Volume volume = new Volume();
+                volume.setPackageName(currentActivityPackageName);
+                //TODO  save the change
             }
         }
-    }
-
-    @Override
-    protected boolean onKeyEvent(KeyEvent event) {
-        MLog.e(TAG, "" + event.getAction());
-        return super.onKeyEvent(event);
-
     }
 }

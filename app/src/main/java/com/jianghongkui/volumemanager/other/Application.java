@@ -16,6 +16,8 @@ public class Application extends android.app.Application {
     public final static String PACKAGENAME = "com.jianghongkui.volumemanager";
     public static boolean firstBoot = true;
 
+    public static boolean saveUserChanges = false;
+
     @Override
     public void onCreate() {
         super.onCreate();

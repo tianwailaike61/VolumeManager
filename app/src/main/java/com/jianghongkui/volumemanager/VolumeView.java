@@ -1,6 +1,11 @@
 package com.jianghongkui.volumemanager;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -11,6 +16,8 @@ import android.widget.TextView;
 
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 import com.jianghongkui.volumemanager.model.VolumeObserver;
+import com.jianghongkui.volumemanager.other.Application;
+import com.jianghongkui.volumemanager.util.MLog;
 import com.jianghongkui.volumemanager.util.Utils;
 
 import butterknife.BindView;
@@ -20,7 +27,7 @@ import butterknife.ButterKnife;
  * Created by jianghongkui on 2016/9/14.
  */
 public class VolumeView extends RelativeLayout {
-
+    private final static String TAG = "VolumeView";
     @BindView(R.id.view_volume_value)
     TextView viewVolumeValue;
     @BindView(R.id.view_volume_type)
@@ -34,11 +41,37 @@ public class VolumeView extends RelativeLayout {
 
     private int volumeMax;
     private int streamType;
+    private int streamValue;
 
 //    private final static int ALARM = 0;
 //    private final static int MUSIC = 1;
 //    private final static int VOICE_CALL = 2;
 //    private final static int RING = 3;
+
+    private final static String action = Application.PACKAGENAME + ".VolumeView_Change";
+
+    private class VolumeViewChangeReciver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            MLog.d(TAG, "onReceiver:" + intent + "-type:" + intent.getIntExtra("streamType", -1) + "-" + streamType);
+            if (action.equals(intent.getAction())) {
+                int type = intent.getIntExtra("streamType", -1);
+                if (type != -1) {
+                    if (type != streamType) {
+                        int value = Utils.getVolume(context, streamType);
+                        MLog.d(TAG, "onReceiver:value:" + value);
+                        if (value != volumeSeekbar.getProgress()) {
+                            MLog.d(TAG, "onReceiver:setProgresss");
+                            volumeSeekbar.setProgress(value);
+                        }
+                    } else {
+                        //int value = intent.getIntExtra("streamValue", 0);
+                        //Utils.setVolume(context, streamType, streamValue);
+                    }
+                }
+            }
+        }
+    }
 
 
     public VolumeView(Context context, AttributeSet attrs) {
@@ -46,6 +79,9 @@ public class VolumeView extends RelativeLayout {
         mContext = context;
         View view = LayoutInflater.from(context).inflate(R.layout.view_volume, this);
         ButterKnife.bind(view);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(action);
+        context.registerReceiver(new VolumeViewChangeReciver(), filter);
     }
 
     public void addObserver(VolumeObserver observer) {
@@ -73,7 +109,11 @@ public class VolumeView extends RelativeLayout {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 Utils.setVolume(mContext, streamType, seekBar.getProgress());
-                notifyObserver(seekBar.getProgress());
+                Intent intent = new Intent();
+                intent.setAction(action);
+               // intent.putExtra("streamValue",streamValue);
+                intent.putExtra("streamType", streamType);
+                mContext.sendBroadcast(intent);
             }
         });
     }
@@ -83,15 +123,21 @@ public class VolumeView extends RelativeLayout {
     }
 
     public void setCanDragged(final Boolean canDragged) {
-        volumeSeekbar.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (canDragged)
-                    return false;
-                else
-                    return true;
-            }
-        });
+        volumeSeekbar.setEnabled(canDragged);
+        //setGradients(canDragged ? Color.WHITE : Color.GRAY);
+        //volumeSeekbar.setBackgroundColor(canDragged ? Color.WHITE : Color.GRAY);
+//        volumeSeekbar.setOnTouchListener(new OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                if (canDragged) {
+//                    volumeSeekbar.setEnabled(true);
+//                    return false;
+//                } else {
+//                    volumeSeekbar.setEnabled(false);
+//                    return true;
+//                }
+//            }
+//        });
     }
 
     public void setVolumeType(int volumeType) {
@@ -99,11 +145,11 @@ public class VolumeView extends RelativeLayout {
         viewVolumeType.setText(strings[volumeType]);
         streamType = volumeType;// getStreamType(volumeType);
         volumeMax = Utils.getMaxVolume(mContext, streamType);
-        int volumevalue = Utils.getVolume(mContext, streamType);
-        setVolumeValue(volumevalue);
+        streamValue = Utils.getVolume(mContext, streamType);
+        setVolumeValue(streamValue);
         setSeekChangedListener();
         volumeSeekbar.setMax(volumeMax);
-        volumeSeekbar.setProgress(volumevalue);
+        volumeSeekbar.setProgress(streamValue);
     }
 
     public int getVolumeType() {

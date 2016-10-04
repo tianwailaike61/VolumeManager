@@ -1,6 +1,8 @@
 package com.jianghongkui.volumemanager.model;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
@@ -9,7 +11,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.animation.OvershootInterpolator;
 
+import com.jianghongkui.volumemanager.other.Application;
 import com.jianghongkui.volumemanager.util.MLog;
+import com.jianghongkui.volumemanager.util.Utils;
 
 import java.util.ArrayList;
 

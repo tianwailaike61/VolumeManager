@@ -31,10 +31,10 @@ public class VolumeDBHelper extends SQLiteOpenHelper {
                 Column._Music + " INTEGER ," +
                 Column._Alarm + " INTEGER ," +
                 Column._Notification + " INTEGER ," +
-                Column._Bluetooth_Call + " INTEGER ," +
-                Column._System_Enforced + " INTEGER ," +
-                Column._DTMF + " INTEGER ," +
-                Column._TTS + " INTEGER ," +
+//                Column._Bluetooth_Call + " INTEGER ," +
+//                Column._System_Enforced + " INTEGER ," +
+//                Column._DTMF + " INTEGER ," +
+//                Column._TTS + " INTEGER ," +
                 Column._Follow_System + " INTEGER" +
                 ");";
         db.execSQL(sql);

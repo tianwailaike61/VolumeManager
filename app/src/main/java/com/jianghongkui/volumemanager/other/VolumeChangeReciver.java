@@ -3,6 +3,7 @@ package com.jianghongkui.volumemanager.other;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.widget.Toast;
 
 import com.jianghongkui.volumemanager.util.MLog;
 
@@ -26,17 +27,18 @@ public class VolumeChangeReciver extends BroadcastReceiver {
         MLog.d(TAG, "onReceive:" + intent);
         if (APP_CHANGE_VOLUME.equals(action)) {
             flag = false;
-            int volumeType = intent.getIntExtra("VolumeType", 0);
-            int volumeValue = intent.getIntExtra("VolumeValue", 0);
-
+            String appName = intent.getStringExtra("Name");
+            String volumeType = intent.getStringExtra("Type");
+            Toast.makeText(context, appName + " is open,app help to change the " + volumeType + " volume!", Toast.LENGTH_SHORT).show();
         }
         if (USER_CHANGE_VOLUME.equals(action)) {
-            intent.getExtras();
             if (flag) {
                 MLog.d(TAG, "user change the volume");
-                Intent intent1 = new Intent();
-                intent1.setAction(ACTION_USER_ADJUST_VOLUME);
-                context.sendBroadcast(intent1);
+                if (Application.saveUserChanges) {
+                    Intent intent1 = new Intent();
+                    intent1.setAction(ACTION_USER_ADJUST_VOLUME);
+                    context.sendBroadcast(intent1);
+                }
             } else {
                 MLog.d(TAG, "this app change the volume");
                 flag = true;

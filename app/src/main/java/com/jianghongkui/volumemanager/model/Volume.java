@@ -1,6 +1,7 @@
 package com.jianghongkui.volumemanager.model;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -94,6 +95,17 @@ public class Volume implements Parcelable {
         return Arrays.equals(values, volume.values);
     }
 
+    public static int[] getDifferentValueType(Volume volume1, Volume volume2) {
+        int[] diff = new int[Column.count];
+        int cout = 0;
+        for (int i = 0; i < Column.count; i++) {
+            if (volume1.getValue(i) != volume2.getValue(i)) {
+                diff[cout++] = i;
+            }
+        }
+        return diff;
+    }
+
     @Override
     public int hashCode() {
         int result = packageName != null ? packageName.hashCode() : 0;
@@ -129,10 +141,10 @@ public class Volume implements Parcelable {
         contentValues.put(Column._Music, values[3]);
         contentValues.put(Column._Alarm, values[4]);
         contentValues.put(Column._Notification, values[5]);
-        contentValues.put(Column._Bluetooth_Call, values[6]);
-        contentValues.put(Column._System_Enforced, values[7]);
-        contentValues.put(Column._DTMF, values[8]);
-        contentValues.put(Column._TTS, values[9]);
+//        contentValues.put(Column._Bluetooth_Call, values[6]);
+//        contentValues.put(Column._System_Enforced, values[7]);
+//        contentValues.put(Column._DTMF, values[8]);
+//        contentValues.put(Column._TTS, values[9]);
         contentValues.put(Column._Follow_System, isFollowSystem ? 1 : 0);
         return contentValues;
     }

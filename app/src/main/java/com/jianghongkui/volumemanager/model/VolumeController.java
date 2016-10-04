@@ -42,8 +42,6 @@ public class VolumeController implements VolumeContainer.ClickListener {
             oldVolume = volumes.get(0);
             container.setVolume(oldVolume);
         }
-
-
     }
 
     public void maybeSaveChanges() {

@@ -46,7 +46,7 @@ public class VolumeContainer implements CheckBox.OnCheckedChangeListener {
     }
 
     public void setVolume(Volume volume) {
-        observer=new VolumeObserver(volume);
+        observer = new VolumeObserver(volume);
         if (volume != null) {
             for (int i = 0; i < views.length; i++) {
                 int volumeType = views[i].getVolumeType();
@@ -62,7 +62,7 @@ public class VolumeContainer implements CheckBox.OnCheckedChangeListener {
         Volume volume = new Volume();
         volume.setFollowSystem(followSystem.isChecked());
         int[] values = new int[Column.count];
-
+        //TODO....
         volume.setValues(values);
         return volume;
     }
