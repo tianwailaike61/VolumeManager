@@ -64,10 +64,10 @@ public class VolumeDetailsFragement extends DialogFragment {
 
     private void initView() {
         VolumeContainer volumeContainer = new VolumeContainer(volumegroup, followSystem);
-        controller = new VolumeController(context, volumeContainer);
+        controller = new VolumeController(context, volumeContainer, application.getPackageName());
         viewProgramIcon.setImageBitmap(application.getIcon());
         viewProgramName.setText(application.getName());
-        controller.setPackageName(application.getPackageName());
+        //controller.setPackageName(application.getPackageName());
     }
 
     @Override
@@ -90,6 +90,7 @@ public class VolumeDetailsFragement extends DialogFragment {
         super.onDetach();
         visibility = false;
         controller.maybeSaveChanges();
+        controller.restoreVolume();
     }
 
     public boolean isVisibility() {

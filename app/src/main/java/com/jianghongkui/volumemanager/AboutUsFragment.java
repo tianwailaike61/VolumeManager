@@ -36,7 +36,6 @@ public class AboutUsFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         view = LayoutInflater.from(context).inflate(R.layout.content_aboutus, null, false);
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(R.string.menu_about_us);
         builder.setView(view);
         return builder.create();
     }

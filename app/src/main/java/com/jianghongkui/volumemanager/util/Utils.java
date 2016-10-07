@@ -7,17 +7,28 @@ import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.jianghongkui.volumemanager.model.Column;
+import com.jianghongkui.volumemanager.model.Volume;
+
 import java.text.NumberFormat;
+
+import static com.jianghongkui.volumemanager.other.Application.PACKAGENAME;
 
 /**
  * Created by jianghongkui on 2016/9/14.
  */
 public class Utils {
 
+    /**
+     * @return RINGER_MODE_NORMAL,
+     * RINGER_MODE_SILENT,
+     * RINGER_MODE_VIBRATE
+     */
     public static int getRingerMode(Context context) {
         AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         return am.getRingerMode();
@@ -34,10 +45,29 @@ public class Utils {
     }
 
     public static void setVolume(Context context, int streamType, int index) {
+        setVolume(context, streamType, index, null);
+    }
+
+    public static int[] getCurrentVolume(Context context) {
+        int[] values = new int[Column.count];
+        for (int i = 0; i < Column.count; i++) {
+            values[i] = getVolume(context, i);
+        }
+        return values;
+    }
+
+    public static Volume getSystemVolume(Context context) {
+        return VolumeDBManager.newInstace(context).query(PACKAGENAME).get(0);
+    }
+
+    public static void setVolume(Context context, int streamType, int index, @Nullable Bundle bundle) {
         Intent intent = new Intent();
         intent.setAction("com.action.app_set_volume");
         intent.putExtra("VolumeType", streamType);
         intent.putExtra("VolumeValue", index);
+        if (bundle != null) {
+            intent.putExtra("Name", bundle.getString("Name"));
+        }
         context.sendBroadcast(intent);
         AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         am.setStreamVolume(streamType, index, AudioManager.FLAG_ALLOW_RINGER_MODES);

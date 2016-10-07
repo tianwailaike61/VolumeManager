@@ -4,11 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -37,11 +34,12 @@ public class VolumeView extends RelativeLayout {
 
     private Context mContext;
 
-    private VolumeObserver observer;
 
     private int volumeMax;
     private int streamType;
     private int streamValue;
+
+    private VolumeObserver volumeObserver;
 
 //    private final static int ALARM = 0;
 //    private final static int MUSIC = 1;
@@ -63,6 +61,9 @@ public class VolumeView extends RelativeLayout {
                         if (value != volumeSeekbar.getProgress()) {
                             MLog.d(TAG, "onReceiver:setProgresss");
                             volumeSeekbar.setProgress(value);
+                            if (volumeObserver != null) {
+                                volumeObserver.update(streamType, value);
+                            }
                         }
                     } else {
                         //int value = intent.getIntExtra("streamValue", 0);
@@ -84,42 +85,51 @@ public class VolumeView extends RelativeLayout {
         context.registerReceiver(new VolumeViewChangeReciver(), filter);
     }
 
-    public void addObserver(VolumeObserver observer) {
-        this.observer = observer;
+    public void setVolumeObserver(VolumeObserver volumeObserver) {
+        this.volumeObserver = volumeObserver;
     }
-
-    private void notifyObserver(int value) {
-        if (observer != null)
-            observer.update(streamType, value);
-    }
-
 
     private void setSeekChangedListener() {
         volumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            private boolean isTouched = false;
+
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 setVolumeValue(progress);
+                if (isTouched) {
+                    Utils.setVolume(mContext, streamType, seekBar.getProgress(), null);
+                    Intent intent = new Intent();
+                    intent.setAction(action);
+                    intent.putExtra("streamType", streamType);
+                    mContext.sendBroadcast(intent);
+                }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                isTouched = true;
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                Utils.setVolume(mContext, streamType, seekBar.getProgress());
-                Intent intent = new Intent();
-                intent.setAction(action);
-               // intent.putExtra("streamValue",streamValue);
-                intent.putExtra("streamType", streamType);
-                mContext.sendBroadcast(intent);
+                isTouched = false;
+                if (volumeObserver != null) {
+                    volumeObserver.update(streamType, seekBar.getProgress());
+                }
             }
         });
     }
 
-    public void setVolumeValue(int volumeValue) {
+    private void setVolumeValue(int volumeValue) {
         viewVolumeValue.setText(Utils.formatPercentage(volumeValue, volumeMax));
+    }
+
+    public void setVolumeValue(long volumeValue) {
+        volumeSeekbar.setProgress((int) volumeValue);
+    }
+
+    public int getVolumeValue() {
+        return volumeSeekbar.getProgress();
     }
 
     public void setCanDragged(final Boolean canDragged) {
@@ -145,11 +155,11 @@ public class VolumeView extends RelativeLayout {
         viewVolumeType.setText(strings[volumeType]);
         streamType = volumeType;// getStreamType(volumeType);
         volumeMax = Utils.getMaxVolume(mContext, streamType);
-        streamValue = Utils.getVolume(mContext, streamType);
-        setVolumeValue(streamValue);
+        //streamValue = Utils.getVolume(mContext, streamType);
+        //setVolumeValue(streamValue);
         setSeekChangedListener();
         volumeSeekbar.setMax(volumeMax);
-        volumeSeekbar.setProgress(streamValue);
+        //volumeSeekbar.setProgress(streamValue);
     }
 
     public int getVolumeType() {

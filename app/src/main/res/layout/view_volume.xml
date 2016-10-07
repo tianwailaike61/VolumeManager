@@ -13,7 +13,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:maxLines="1" />
 
         <TextView
             android:id="@+id/view_volume_value"
@@ -21,6 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
+            android:maxLines="1"
             android:text="100%" />
 
         <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper

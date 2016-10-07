@@ -13,12 +13,12 @@
         <item>TTS</item>
     </string-array>
 
-    <string name="follow_system">跟随系统</string>
+    <string name="dialog_follow_system">跟随系统</string>
 
     <string name="loadmore">加载中。。。</string>
 
     <!-- WindowChangeDetectingService String -->
-    <string name="accessibility_service_description">accessibility_service_description</string>
+    <string name="accessibility_service_description">\t该服务主要监听应用的启动，以完成当应用启动时调节音量</string>
     <string name="accessibility_service_name">音量管理服务</string>
     <string name="title_activity_volume">VolumeActivity</string>
     <string name="title_activity_settings">设置</string>
@@ -27,9 +27,33 @@
     <string name="menu_settings">设置</string>
     <string name="menu_change_recycler_layoutmanager">切换布局</string>
     <string name="menu_about_us">关于我们</string>
+    <string name="menu_about_us_content">\t该应用帮助用户调节声音</string>
 
     <!-- Snackbar String -->
     <string name="snackbar_setting">设置</string>
     <string name="snackbar_messege">请在设置中开启服务！</string>
+
+    <!-- Setting  string -->
+    <string name="wait">敬请期待</string>
+    <string name="preference_notification">快捷状态栏</string>
+    <string name="preference_notification_on_description">启用快捷状态栏</string>
+    <string name="preference_notification_off_description">关闭快捷状态栏</string>
+
+    <string name="preference_question">问题</string>
+    <string name="preference_question_content">该问题主要是由于辅助服务时常关闭导致的，请尝试以下方法：
+     \n\n三星：设置 - 安全 - 自启动 \n\nMIUI：设置（或 安全中心）- 授权管理 - 自启动管理 \n\n华为：设置 - 授权管理 - 自启动管理
+        \n\nMEIZU：设置 - 应用 - 音量管理 - 权限 - 自启动 \n\n索尼：设置 - 电源管理 - STAMINA模式</string>
+    <string name="preference_question_description">有时无法调节音量</string>
+    <string name="preference_save_users_change">保存用户更改</string>
+    <string name="preference_save_users_change_on_description">同步用户的修改</string>
+    <string name="preference_save_users_change_off_description">不保存用户的修改</string>
+    <string name="preference_save_type">保存类型</string>
+    <string-array name="preference_save_type">
+        <item>保存到系统音量</item>
+        <item>保存到该应用音量</item>
+    </string-array>
+    <string name="preference_other_function">其他功能n</string>
+    <string name="preference_other_function_description">查看更多</string>
+
 
 </resources>

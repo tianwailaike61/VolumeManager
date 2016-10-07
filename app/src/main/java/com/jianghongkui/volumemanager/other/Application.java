@@ -7,6 +7,9 @@ import com.jianghongkui.volumemanager.model.Volume;
 import com.jianghongkui.volumemanager.util.Utils;
 import com.jianghongkui.volumemanager.util.VolumeDBManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by jianghongkui on 2016/9/27.
  */
@@ -15,8 +18,6 @@ public class Application extends android.app.Application {
 
     public final static String PACKAGENAME = "com.jianghongkui.volumemanager";
     public static boolean firstBoot = true;
-
-    public static boolean saveUserChanges = false;
 
     @Override
     public void onCreate() {

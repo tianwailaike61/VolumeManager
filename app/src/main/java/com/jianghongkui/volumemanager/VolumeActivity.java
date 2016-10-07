@@ -22,6 +22,7 @@ import com.jianghongkui.volumemanager.model.RecyclerVIewController;
 import com.jianghongkui.volumemanager.model.RecyclerViewContainer;
 import com.jianghongkui.volumemanager.other.WindowChangeDetectingService;
 import com.jianghongkui.volumemanager.util.MLog;
+import com.jianghongkui.volumemanager.util.MPackageManager;
 import com.jianghongkui.volumemanager.util.Utils;
 
 import java.util.ArrayList;
@@ -152,11 +153,13 @@ public class VolumeActivity extends AppCompatActivity implements RecyclerViewCon
         return application;
     }
 
+
+
     @Override
     public ArrayList<Program> refresh() {
         MLog.d(TAG, "refresh");
         ArrayList<Program> data = new ArrayList<>();
-        packageInfos = getPackageManager().getInstalledPackages(0);
+        packageInfos = MPackageManager.newInstance(this).getPackageInfos();
         int size = packageInfos.size();
         recyclerVIewController.setTotal(size);
         int count = recyclerVIewController.needAddCount();

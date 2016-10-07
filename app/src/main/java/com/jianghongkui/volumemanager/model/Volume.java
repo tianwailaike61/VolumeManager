@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * Created by jianghongkui on 2016/9/18.
  */
-public class Volume implements Parcelable {
+public class Volume {
     private int id = -1;
     private String packageName;
     private boolean isFollowSystem = true;
@@ -37,18 +37,6 @@ public class Volume implements Parcelable {
         isFollowSystem = in.readByte() != 0;
         values = in.createIntArray();
     }
-
-    public static final Creator<Volume> CREATOR = new Creator<Volume>() {
-        @Override
-        public Volume createFromParcel(Parcel in) {
-            return new Volume(in);
-        }
-
-        @Override
-        public Volume[] newArray(int size) {
-            return new Volume[size];
-        }
-    };
 
     public int getId() {
         return id;
@@ -114,11 +102,11 @@ public class Volume implements Parcelable {
         return result;
     }
 
-    public static Volume clone(Volume volume) {
+    public Volume clone() {
         Volume newVolume = new Volume();
-        newVolume.setId(volume.getId());
-        newVolume.setPackageName(volume.getPackageName());
-        newVolume.setValues(volume.getValues());
+        newVolume.setId(id);
+        newVolume.setPackageName(packageName);
+        newVolume.setValues(Arrays.copyOf(values, values.length));
         return newVolume;
     }
 
@@ -151,19 +139,14 @@ public class Volume implements Parcelable {
 
     @Override
     public String toString() {
-        return super.toString();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeString(packageName);
-        dest.writeByte((byte) (isFollowSystem ? 1 : 0));
-        dest.writeIntArray(values);
+        StringBuilder builder = new StringBuilder();
+        builder.append("Volume{");
+        if (id != -1)
+            builder.append("id=" + id + ",");
+        builder.append("isFollowSystem=" + isFollowSystem + ",");
+        for (int i = 0; i < values.length; i++)
+            builder.append(i + "=" + values[i] + ",");
+        builder.append("}");
+        return builder.toString();
     }
 }

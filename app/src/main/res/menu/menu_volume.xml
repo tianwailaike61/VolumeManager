@@ -10,6 +10,6 @@
         <!--android:title="@string/menu_change_recycler_layoutmanager" />-->
     <item
         android:id="@+id/menu_about_us"
-        android:orderInCategory="3"
+        android:orderInCategory="2"
         android:title="@string/menu_about_us" />
 </menu>
