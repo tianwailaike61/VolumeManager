@@ -74,7 +74,7 @@ public class VolumeChangeReciver extends BroadcastReceiver {
 
     private void showMessage(String msg) {
         if (Settings.showNotification) {
-            Intent intent = new Intent(NotificationService.ACTION_NOTIFICATION_CHANGED);
+            Intent intent = new Intent(VolumeChangeService.ACTION_NOTIFICATION_MASSAFE_CHANGED);
             intent.putExtra("message", msg);
             context.sendBroadcast(intent);
         } else {

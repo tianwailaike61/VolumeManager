@@ -52,7 +52,7 @@
         <item>保存到系统音量</item>
         <item>保存到该应用音量</item>
     </string-array>
-    <string name="preference_other_function">其他功能n</string>
+    <string name="preference_other_function">其他功能</string>
     <string name="preference_other_function_description">查看更多</string>
 
 

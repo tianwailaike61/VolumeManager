@@ -1,5 +1,6 @@
 package com.jianghongkui.volumemanager.util;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,6 +17,7 @@ import com.jianghongkui.volumemanager.model.Column;
 import com.jianghongkui.volumemanager.model.Volume;
 
 import java.text.NumberFormat;
+import java.util.List;
 
 import static com.jianghongkui.volumemanager.other.Application.PACKAGENAME;
 
@@ -98,6 +100,24 @@ public class Utils {
         drawable.setBounds(0, 0, w, h);
         drawable.draw(canvas);
         return bitmap;
+    }
+
+    public static boolean isServiceWork(Context mContext,String serviceName) {
+        boolean isWork = false;
+        ActivityManager myAM = (ActivityManager) mContext
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> myList = myAM.getRunningServices(40);
+        if (myList.size() <= 0) {
+            return false;
+        }
+        for (int i = 0; i < myList.size(); i++) {
+            String mName = myList.get(i).service.getClassName().toString();
+            if (mName.equals(serviceName)) {
+                isWork = true;
+                break;
+            }
+        }
+        return isWork;
     }
 
     public static boolean isAccessibilitySettingsOn(Context mContext, String service) {

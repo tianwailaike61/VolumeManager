@@ -145,14 +145,15 @@ public class VolumeActivity extends AppCompatActivity implements RecyclerViewCon
     }
 
     private Program getApplication(PackageInfo packageInfo) {
+        int iconWidth, iconHeigh;
+        iconWidth = iconHeigh = 100;//(int) getResources().getDimension(R.dimen.recyclerview_icon_size);
         Program application = new Program();
         application.setName(packageInfo.applicationInfo.loadLabel(getPackageManager()).toString());
         Drawable drawable = packageInfo.applicationInfo.loadIcon(getPackageManager());
-        application.setIcon(Utils.drawableToBitamp(drawable, 100, 100));
+        application.setIcon(Utils.drawableToBitamp(drawable, iconWidth, iconHeigh));
         application.setPackageName(packageInfo.packageName);
         return application;
     }
-
 
 
     @Override

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
+import com.jianghongkui.volumemanager.other.Application;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +22,7 @@ public class MPackageManager {
 
 
     private MPackageManager(Context context) {
-        this.context=context;
+        this.context = context;
     }
 
     public synchronized static MPackageManager newInstance(Context context) {
@@ -31,10 +33,12 @@ public class MPackageManager {
 
     public List<PackageInfo> getPackageInfos() {
         PackageManager manager = context.getPackageManager();
-        List<PackageInfo> packageInfos=new ArrayList<>();;
+        List<PackageInfo> packageInfos = new ArrayList<>();
+        ;
         List<PackageInfo> packageInfoList = manager.getInstalledPackages(0);
         for (PackageInfo info : packageInfoList) {
-            if (manager.getLaunchIntentForPackage(info.packageName) != null) {
+            if (!info.packageName.equals(Application.PACKAGENAME) &&
+                    manager.getLaunchIntentForPackage(info.packageName) != null) {
                 packageInfos.add(info);
             }
         }

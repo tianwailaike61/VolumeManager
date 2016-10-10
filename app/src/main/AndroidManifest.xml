@@ -3,6 +3,8 @@
     package="com.jianghongkui.volumemanager">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:name=".other.Application"
@@ -36,6 +38,20 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".other.CallReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".other.ServiceStartReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.TIME_TICK" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".other.WindowChangeDetectingService"
             android:label="@string/accessibility_service_name"
@@ -52,15 +68,17 @@
         <provider
             android:name=".other.PackageVolumeProvider"
             android:authorities="com.jianghongkui.volumemanager" />
-
-        <service
-            android:name=".other.NotificationService"
-            android:enabled="true"
-            android:exported="true" />
         <service
             android:name=".other.AudioRecordService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+        <service
+            android:name=".other.VolumeChangeService"
+            android:enabled="true">
+            <intent-filter android:priority="1000">
+                <action android:name="com.jianghongkui.volumemanager" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

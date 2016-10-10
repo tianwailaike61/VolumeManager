@@ -9,7 +9,8 @@ import android.preference.PreferenceActivity;
 import android.widget.Toast;
 
 import com.jianghongkui.volumemanager.model.Settings;
-import com.jianghongkui.volumemanager.other.NotificationService;
+import com.jianghongkui.volumemanager.other.AudioRecordService;
+import com.jianghongkui.volumemanager.other.VolumeChangeService;
 import com.jianghongkui.volumemanager.util.MLog;
 
 
@@ -20,17 +21,24 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        init();
+    }
+
+    private void init() {
         addPreferencesFromResource(R.xml.preference_settings);
+        setOnPreferenceChangeListener(R.string.preference_notification);
+        setOnPreferenceChangeListener(R.string.preference_save_users_change);
+        setOnPreferenceChangeListener(R.string.preference_call);
+        setOnPreferenceClickListener(R.string.preference_question);
+        setOnPreferenceClickListener(R.string.preference_other_function);
+    }
 
-        findPreference(getString(R.string.preference_notification))
-                .setOnPreferenceChangeListener(this);
-        findPreference(getString(R.string.preference_save_users_change))
-                .setOnPreferenceChangeListener(this);
-        findPreference(getString(R.string.preference_question))
-                .setOnPreferenceClickListener(this);
-        findPreference(getString(R.string.preference_other_function))
-                .setOnPreferenceClickListener(this);
+    private void setOnPreferenceChangeListener(int strId) {
+        findPreference(getString(strId)).setOnPreferenceChangeListener(this);
+    }
 
+    private void setOnPreferenceClickListener(int strId) {
+        findPreference(getString(strId)).setOnPreferenceClickListener(this);
     }
 
     @Override
@@ -47,8 +55,19 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
+        if (preference.getKey().equals(getString(R.string.preference_call))) {
+
+            boolean flag = (boolean) newValue;
+            Intent intent = new Intent(this, AudioRecordService.class);
+            if (flag) {
+                startService(intent);
+            } else {
+                stopService(intent);
+            }
+        }
         if (preference.getKey().equals(getString(R.string.preference_notification))) {
             boolean flag = (boolean) newValue;
+            Settings.showNotification = flag;
             MLog.e(TAG, "onPreferenceChange");
             if (flag) {
                 startNotification();
@@ -63,20 +82,20 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     }
 
     private void startNotification() {
-//        Intent intent = new Intent();
-//        intent.setAction(VolumeChangeService.ACTION_NOTIFICATION_CHANGED);
-//        intent.putExtra("state","on");
-//        sendBroadcast(intent);
-        Intent intent = new Intent(SettingsActivity.this, NotificationService.class);
-        startService(intent);
+        Intent intent = new Intent();
+        intent.setAction(VolumeChangeService.ACTION_NOTIFICATION_STATE_CHANGED);
+        intent.putExtra("state", true);
+        sendBroadcast(intent);
+//        Intent intent = new Intent(SettingsActivity.this, VolumeChangeService.class);
+//        startService(intent);
     }
 
     private void stopNotification() {
-//        Intent intent = new Intent();
-//        intent.setAction(VolumeChangeService.ACTION_NOTIFICATION_CHANGED);
-//        intent.putExtra("state","off");
-//        sendBroadcast(intent);
-        Intent intent = new Intent(this, NotificationService.class);
-        stopService(intent);
+        Intent intent = new Intent();
+        intent.setAction(VolumeChangeService.ACTION_NOTIFICATION_STATE_CHANGED);
+        intent.putExtra("state", false);
+        sendBroadcast(intent);
+//        Intent intent = new Intent(this, VolumeChangeService.class);
+//        stopService(intent);
     }
 }

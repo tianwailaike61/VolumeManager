@@ -7,7 +7,9 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.jianghongkui.volumemanager.model.Settings;
-import com.jianghongkui.volumemanager.other.AudioRecordService;
+import com.jianghongkui.volumemanager.other.VolumeChangeService;
+import com.jianghongkui.volumemanager.util.MLog;
+import com.jianghongkui.volumemanager.util.Utils;
 
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -18,10 +20,11 @@ public class WelcomeActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_welcom);
-        //startService(new Intent(this, VolumeChangeService.class));
-        Intent intent =new Intent(this, AudioRecordService.class);
-        startService(intent);
         Settings.init(getApplicationContext());
+        if (!Utils.isServiceWork(this, VolumeChangeService.class.getSimpleName())) {
+            Intent intent = new Intent(this, VolumeChangeService.class);
+            startService(intent);
+        }
         new Thread(new Runnable() {
             @Override
             public void run() {

@@ -43,6 +43,9 @@
     <string name="preference_save_users_change">save the users changes</string>
     <string name="preference_save_users_change_off_description">when user change the sound,
         the app do nothing!</string>
+    <string name="preference_call">call</string>
+    <string name="preference_call_on_description">preference_notification_on_description</string>
+    <string name="preference_call_off_description">preference_notification_off_description</string>
     <string name="preference_save_users_change_on_description">when user change the sound,
         the sounds will be saved into databases!</string>
     <string name="preference_question">question</string>
