@@ -52,8 +52,24 @@
         <item>保存到系统音量</item>
         <item>保存到该应用音量</item>
     </string-array>
+    <string-array name="preference_save_value">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
     <string name="preference_other_function">其他功能</string>
     <string name="preference_other_function_description">查看更多</string>
+    <string name="preference_force_change_music">强制修改媒体音量</string>
+    <string name="preference_force_change_music_no_description">当播放音乐时，打开其他应用强制修改媒体音量</string>
+    <string name="preference_force_change_music_off_description">当播放音乐时，打开其他应用不修改媒体音量</string>
+    <string name="preference_force_change_voice_call">强制修改通话音量</string>
+    <string name="preference_force_change_voice_call_no_description">当正在通话时，打开其他应用强制修改通话音量</string>
+    <string name="preference_force_change_voice_call_off_description">当正在通话时，打开其他应用不修改通话音量</string>
+
+    <!-- notification String -->
+    <string name="notification_title">音量管理正在运行</string>
+    <string name="notification_msg_change_volume">"音量管理为%1$s修改音量"</string>
+    <string name="notification_msg_change_volume_extra">"(除了%1$s音量)"</string>
+    <string name="notification_msg_save_volume">调节音量将被保存到%1$s!</string>
 
 
 </resources>

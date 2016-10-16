@@ -162,6 +162,7 @@ public class VolumeActivity extends AppCompatActivity implements RecyclerViewCon
         ArrayList<Program> data = new ArrayList<>();
         packageInfos = MPackageManager.newInstance(this).getPackageInfos();
         int size = packageInfos.size();
+        MLog.d(TAG, "total size:" + size);
         recyclerVIewController.setTotal(size);
         int count = recyclerVIewController.needAddCount();
         MLog.d(TAG, "it will add " + count + " datas");

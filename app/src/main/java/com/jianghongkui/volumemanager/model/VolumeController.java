@@ -32,7 +32,7 @@ public class VolumeController implements VolumeContainer.ClickListener {
             manager = VolumeDBManager.newInstace(context);
         }
         if (systemVolume == null) {
-            systemVolume = manager.query(Application.PACKAGENAME).get(0);
+            systemVolume = manager.query(Application.SYSTEM).get(0);
         }
     }
 
@@ -90,15 +90,19 @@ public class VolumeController implements VolumeContainer.ClickListener {
     }
 
     public void restoreVolume() {
-        if (systemVolume == null) {
-            systemVolume = manager.query(Application.PACKAGENAME).get(0);
+        Volume volume = null;
+        ArrayList<Volume> volumes = (ArrayList<Volume>) manager.query(Application.PACKAGENAME);
+        if (volumes == null || volumes.size() == 0) {
+            volume = manager.query(Application.SYSTEM).get(0);
+        } else {
+            volume = volumes.get(0);
         }
         int[] currentValues = Utils.getCurrentVolume(context);
-        int[] systemValues = systemVolume.getValues();
-        MLog.d(TAG, "restoreVolume:" + systemVolume);
+        int[] values = volume.getValues();
+        MLog.d(TAG, "restoreVolume:" + volume);
         for (int i = 0; i < currentValues.length; i++) {
-            if (currentValues[i] != systemValues[i]) {
-                Utils.setVolume(context, i, systemValues[i]);
+            if (currentValues[i] != values[i]) {
+                Utils.setVolume(context, i, values[i]);
             }
         }
 

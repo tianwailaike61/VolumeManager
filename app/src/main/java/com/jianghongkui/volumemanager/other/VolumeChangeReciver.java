@@ -3,17 +3,11 @@ package com.jianghongkui.volumemanager.other;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.widget.Toast;
+import android.os.Bundle;
 
+import com.jianghongkui.volumemanager.model.Notice;
 import com.jianghongkui.volumemanager.model.Settings;
-import com.jianghongkui.volumemanager.model.Volume;
 import com.jianghongkui.volumemanager.util.MLog;
-import com.jianghongkui.volumemanager.util.Utils;
-import com.jianghongkui.volumemanager.util.VolumeDBManager;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 
 /**
  * Created by jianghongkui on 2016/9/21.
@@ -21,12 +15,13 @@ import java.util.ArrayList;
 
 public class VolumeChangeReciver extends BroadcastReceiver {
     private final String TAG = "VolumeChangeReciver";
-    private boolean flag = true;
-    private final String APP_CHANGE_VOLUME = "com.action.app_set_volume";
-    private final String USER_CHANGE_VOLUME = "android.media.VOLUME_CHANGED_ACTION";
-    private final String ACTION_USER_ADJUST_VOLUME = "com.action.user_adjust_volume";
+    public static final String ACTION_APP_CHANGE_VOLUME = "com.action.app_set_volume";
+    public static final String ACTION_USER_CHANGE_VOLUME = "android.media.VOLUME_CHANGED_ACTION";
+
 
     private Context context;
+
+    private boolean userschange = false;
 
     private String name;
 
@@ -34,26 +29,32 @@ public class VolumeChangeReciver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         this.context = context;
         String action = intent.getAction();
-        //MLog.d(TAG, "onReceive:" + intent);
-        if (APP_CHANGE_VOLUME.equals(action)) {
-            flag = false;
-            String appName = intent.getStringExtra("Name");
-            if (appName != null && !appName.equals(name)) {
-                showMessage(appName + " is open,app help to change the volume!");
-                name = appName;
+        MLog.d(TAG, "onReceive:" + intent);
+        if (ACTION_APP_CHANGE_VOLUME.equals(action)) {
+            userschange = false;
+            Notice notice = intent.getParcelableExtra(Notice.KEY);
+            MLog.d(TAG, "notice:" + notice);
+            if (notice != null && !notice.getName().equals(name)) {
+
+                Intent newIntent = new Intent(MessageNotifyReceiver.ACTION_MESSAGE_NOTIFY);
+                Bundle mBundle = new Bundle();
+                mBundle.putParcelable(Notice.KEY, notice);
+                newIntent.putExtras(mBundle);
+                context.sendBroadcast(newIntent);
+                name = notice.getName();
             }
-        }
-        if (USER_CHANGE_VOLUME.equals(action)) {
-            if (flag) {
+        } else if (ACTION_USER_CHANGE_VOLUME.equals(action)) {
+            if (userschange) {
                 // MLog.d(TAG, "user change the volume");
                 if (Settings.saveUserChanges) {
                     Intent intent1 = new Intent();
-                    intent1.setAction(ACTION_USER_ADJUST_VOLUME);
+                    intent1.setAction(WindowChangeDetectingService.UserAdjustVolumeReceiver.
+                            ACTION_USER_ADJUST_VOLUME);
                     context.sendBroadcast(intent1);
                 }
             } else {
                 //MLog.d(TAG, "this app change the volume");
-                flag = true;
+                userschange = true;
             }
         }
 //        if (USER_CHANGE_VOLUME_MODE.equals(action)) {
@@ -70,16 +71,6 @@ public class VolumeChangeReciver extends BroadcastReceiver {
 //                    break;
 //            }
 //        }
-    }
-
-    private void showMessage(String msg) {
-        if (Settings.showNotification) {
-            Intent intent = new Intent(VolumeChangeService.ACTION_NOTIFICATION_MASSAFE_CHANGED);
-            intent.putExtra("message", msg);
-            context.sendBroadcast(intent);
-        } else {
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-        }
     }
 
 //    /**

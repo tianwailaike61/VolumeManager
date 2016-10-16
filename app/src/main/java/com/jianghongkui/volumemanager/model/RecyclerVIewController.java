@@ -68,6 +68,7 @@ public class RecyclerVIewController extends RecyclerView.OnScrollListener implem
         } else {
             container.needShowFooter(false);
         }
+        count = 0;
     }
 
     public int getCount() {
@@ -130,6 +131,8 @@ public class RecyclerVIewController extends RecyclerView.OnScrollListener implem
             container.needShowFooter(false);
             state = REFRESHING;
             container.startOperation(handler, container.REFRESH);
+        } else {
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 }

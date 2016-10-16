@@ -98,6 +98,7 @@ public class RecyclerViewContainer<T> {
 
     public void needShowFooter(boolean isNeed) {
         adapter.setFooterEnable(isNeed);
+        adapter.notifyDataSetChanged();
     }
 
     public boolean isFooterEnable() {
@@ -166,7 +167,7 @@ public class RecyclerViewContainer<T> {
 
     public void setLayoutManager(RecyclerView.LayoutManager layoutManager) {
         this.layoutManager = layoutManager;
-        recyclerView.swapAdapter(adapter,false);
+        recyclerView.swapAdapter(adapter, false);
         setAdapter();
         adapter.notifyDataSetChanged();
     }

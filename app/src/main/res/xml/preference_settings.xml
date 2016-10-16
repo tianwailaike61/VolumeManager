@@ -2,6 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <SwitchPreference
+        android:defaultValue="true"
         android:key="@string/preference_notification"
         android:summaryOff="@string/preference_notification_off_description"
         android:summaryOn="@string/preference_notification_on_description"
@@ -24,11 +25,19 @@
         android:positiveButtonText="@null"
         android:title="@string/preference_save_type" />
 
+
     <SwitchPreference
-        android:key="@string/preference_call"
-        android:summaryOff="@string/preference_call_off_description"
-        android:summaryOn="@string/preference_call_on_description"
-        android:title="@string/preference_call" />
+        android:key="@string/preference_force_change_voice_call"
+        android:summaryOff="@string/preference_force_change_voice_call_off_description"
+        android:summaryOn="@string/preference_force_change_voice_call_no_description"
+        android:title="@string/preference_force_change_voice_call" />
+
+    <SwitchPreference
+        android:key="@string/preference_force_change_music"
+        android:summaryOff="@string/preference_force_change_music_off_description"
+        android:summaryOn="@string/preference_force_change_music_no_description"
+        android:title="@string/preference_force_change_music" />
+
 
     <Preference
         android:key="@string/preference_question"

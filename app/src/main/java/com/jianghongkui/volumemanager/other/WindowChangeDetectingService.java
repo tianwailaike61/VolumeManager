@@ -7,9 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.accessibility.AccessibilityEvent;
 
+import com.jianghongkui.volumemanager.model.Notice;
 import com.jianghongkui.volumemanager.model.Settings;
 import com.jianghongkui.volumemanager.model.Volume;
 import com.jianghongkui.volumemanager.util.MLog;
@@ -28,11 +30,13 @@ public class WindowChangeDetectingService extends AccessibilityService {
 
     public static final String Service = Application.PACKAGENAME + "/"
             + WindowChangeDetectingService.class.getPackage().getName() + "." + WindowChangeDetectingService.class.getSimpleName();
-    private final String ACTION_USER_ADJUST_VOLUME = "com.action.user_adjust_volume";
-    private final String ACTION_APP_SET_VOLUME = "com.action.app_set_volume";
-    private final String USER_CHANGE_VOLUME = "android.media.VOLUME_CHANGED_ACTION";
+//    private final String ACTION_USER_ADJUST_VOLUME = "com.action.user_adjust_volume";
+//    private final String ACTION_APP_SET_VOLUME = "com.action.app_set_volume";
+//    private final String USER_CHANGE_VOLUME = "android.media.VOLUME_CHANGED_ACTION";
 
     private String currentActivityPackageName;
+    private String lastActivityPackageName;
+    public String currentChangeVolumePackageName;
     private Context context;
     private VolumeDBManager manager;
 
@@ -57,14 +61,19 @@ public class WindowChangeDetectingService extends AccessibilityService {
     private void initReceiver() {
         VolumeChangeReciver volumeChangeReciver = new VolumeChangeReciver();
         IntentFilter filter1 = new IntentFilter();
-        filter1.addAction(USER_CHANGE_VOLUME);
-        filter1.addAction(ACTION_APP_SET_VOLUME);
+        filter1.addAction(VolumeChangeReciver.ACTION_USER_CHANGE_VOLUME);
+        filter1.addAction(VolumeChangeReciver.ACTION_APP_CHANGE_VOLUME);
         registerReceiver(volumeChangeReciver, filter1);
 
         UserAdjustVolumeReceiver userAdjustVolumeReceiver = new UserAdjustVolumeReceiver();
         IntentFilter filter2 = new IntentFilter();
-        filter2.addAction(ACTION_USER_ADJUST_VOLUME);
+        filter2.addAction(UserAdjustVolumeReceiver.ACTION_USER_ADJUST_VOLUME);
         registerReceiver(userAdjustVolumeReceiver, filter2);
+
+        TimeTickReceiver timeTickReceiver = new TimeTickReceiver();
+        IntentFilter filter3 = new IntentFilter();
+        filter3.addAction(Intent.ACTION_TIME_TICK);
+        registerReceiver(timeTickReceiver, filter3);
     }
 
     @Override
@@ -75,9 +84,14 @@ public class WindowChangeDetectingService extends AccessibilityService {
 //                    event.getClassName().toString()
 //            );
             currentActivityPackageName = event.getPackageName().toString();
-            Intent intent = new Intent(VolumeChangeService.ACTION_ACTIVITY_CHANGED);
-            intent.putExtra("PackageName",currentActivityPackageName);
-            sendBroadcast(intent);
+            MLog.d(TAG, "onAccessibilityEvent currentActivityPackageName:" + currentActivityPackageName);
+            if (!currentActivityPackageName.equals(lastActivityPackageName) && !Settings.list.contains(currentActivityPackageName)) {
+                Intent intent = new Intent(VolumeChangeService.ACTION_ACTIVITY_CHANGED);
+                intent.putExtra("PackageName", currentActivityPackageName);
+                sendBroadcast(intent);
+                lastActivityPackageName = currentActivityPackageName;
+                currentChangeVolumePackageName = null;
+            }
         }
     }
 
@@ -87,9 +101,10 @@ public class WindowChangeDetectingService extends AccessibilityService {
     }
 
     private void saveIntoSystem() {
-        Volume systemVolume = getVolumeFromDatabases(Application.PACKAGENAME);
+        Volume systemVolume = getVolumeFromDatabases(Application.SYSTEM);
         systemVolume.setValues(Utils.getCurrentVolume(context));
         saveVolumeIntoDatabases(systemVolume);
+
     }
 
     @Nullable
@@ -105,7 +120,8 @@ public class WindowChangeDetectingService extends AccessibilityService {
     private void saveIntoPrograme() {
         Volume volume = new Volume();
         volume.setFollowSystem(false);
-        volume.setPackageName(currentActivityPackageName);
+        volume.setPackageName(lastActivityPackageName);
+        MLog.d(TAG, "saveIntoPrograme--" + lastActivityPackageName);
         volume.setValues(Utils.getCurrentVolume(context));
         saveVolumeIntoDatabases(volume);
     }
@@ -120,19 +136,61 @@ public class WindowChangeDetectingService extends AccessibilityService {
             manager.insert(volume);
     }
 
-    private class UserAdjustVolumeReceiver extends BroadcastReceiver {
+    public class UserAdjustVolumeReceiver extends BroadcastReceiver {
+        public static final String ACTION_USER_ADJUST_VOLUME = "com.action.user_adjust_volume";
+
         @Override
         public void onReceive(Context context, Intent intent) {
             MLog.d(TAG, "onReceive:" + intent);
-            if (intent.getAction().equals(ACTION_USER_ADJUST_VOLUME)) {
-                if (Settings.saveUserChanges) {
+            MLog.d(TAG, "onReceive:" + currentActivityPackageName + " " + lastActivityPackageName);
+            String action = intent.getAction();
+            if (ACTION_USER_ADJUST_VOLUME.equals(action)) {
+                if (Settings.saveUserChanges && shouldSave()) {
                     if (Settings.isSaveIntoSystem) {
                         saveIntoSystem();
                     } else {
                         saveIntoPrograme();
                     }
+                    if (!lastActivityPackageName.equals(currentChangeVolumePackageName)) {
+                        notifyMessage();
+                        currentChangeVolumePackageName = lastActivityPackageName;
+                    }
 
                 }
+            }
+        }
+
+        private boolean shouldSave() {
+            if (lastActivityPackageName.equals(Application.PACKAGENAME))
+                return false;
+            if (Settings.list.contains(lastActivityPackageName))
+                return false;
+            return true;
+        }
+
+        private void notifyMessage() {
+            MLog.d(TAG,"notifyMessage");
+            Intent newIntent = new Intent(MessageNotifyReceiver.ACTION_MESSAGE_NOTIFY);
+            Notice notice = new Notice();
+            notice.setType(Notice.SAVE_VOLUME);
+            if (Settings.isSaveIntoSystem) {
+                notice.setName("system");
+            } else {
+                notice.setName(lastActivityPackageName);
+            }
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(Notice.KEY, notice);
+            newIntent.putExtras(bundle);
+            context.sendBroadcast(newIntent);
+        }
+    }
+
+    private class TimeTickReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (Settings.allowSelfStart && !Utils.isServiceWork(context, VolumeChangeReciver.class.getSimpleName())) {
+                Intent intent1 = new Intent(context, VolumeChangeService.class);
+                context.startService(intent1);
             }
         }
     }

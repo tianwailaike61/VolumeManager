@@ -17,6 +17,7 @@ import java.util.List;
 public class Application extends android.app.Application {
 
     public final static String PACKAGENAME = "com.jianghongkui.volumemanager";
+    public final static String SYSTEM="voice_system";
     public static boolean firstBoot = true;
 
     @Override
@@ -36,7 +37,7 @@ public class Application extends android.app.Application {
     private void initSystemVolume() {
         Volume system = new Volume();
         system.setFollowSystem(true);
-        system.setPackageName(PACKAGENAME);
+        system.setPackageName(SYSTEM);
         int[] values = new int[Column.count];
         for (int i = 0; i < Column.count; i++) {
             values[i] = Utils.getVolume(this, i);

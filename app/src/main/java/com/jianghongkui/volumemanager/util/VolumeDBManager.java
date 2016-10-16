@@ -36,7 +36,12 @@ public class VolumeDBManager {
         List<Volume> volumes = null;
         Uri rowAddress = ContentUris.withAppendedId(PackageVolumeProvider.CONTENT_URI, 1);
         String[] result_columns = null;
-        String where = Column._PackageName + "='" + packageName + "'";
+        String where;
+        if (packageName == null) {
+            where = null;
+        } else {
+            where = Column._PackageName + "='" + packageName + "'";
+        }
         String[] whereArgs = null;
         String order = null;
         Cursor cursor = resolver.query(rowAddress, result_columns, where, whereArgs, order);

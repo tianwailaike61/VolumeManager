@@ -3,6 +3,8 @@ package com.jianghongkui.volumemanager.util;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
@@ -58,26 +60,35 @@ public class Utils {
         return values;
     }
 
-    public static Volume getSystemVolume(Context context) {
-        return VolumeDBManager.newInstace(context).query(PACKAGENAME).get(0);
-    }
-
     public static void setVolume(Context context, int streamType, int index, @Nullable Bundle bundle) {
         Intent intent = new Intent();
         intent.setAction("com.action.app_set_volume");
         intent.putExtra("VolumeType", streamType);
         intent.putExtra("VolumeValue", index);
         if (bundle != null) {
-            intent.putExtra("Name", bundle.getString("Name"));
+            intent.putExtras(bundle);
+//            intent.putExtra("Name", bundle.getString("Name"));
+//            intent.putExtra("NotChangeVolumeTypes", bundle.getIntegerArrayList("NotChangeVolumeTypes"));
         }
         context.sendBroadcast(intent);
         AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         am.setStreamVolume(streamType, index, AudioManager.FLAG_ALLOW_RINGER_MODES);
     }
 
-    public static void adjustVolume(Context context, int streamType, int direction) {
-        AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        am.adjustStreamVolume(streamType, direction, AudioManager.FLAG_PLAY_SOUND);
+    public static String getAppName(Context context, String packageName) {
+        PackageManager packageManager = null;
+        PackageInfo info = null;
+        try {
+            packageManager = context.getPackageManager();
+            info = packageManager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
+            return info.applicationInfo.loadLabel(packageManager).toString();
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            packageManager = null;
+            info = null;
+        }
     }
 
     @Nullable
@@ -102,7 +113,7 @@ public class Utils {
         return bitmap;
     }
 
-    public static boolean isServiceWork(Context mContext,String serviceName) {
+    public static boolean isServiceWork(Context mContext, String serviceName) {
         boolean isWork = false;
         ActivityManager myAM = (ActivityManager) mContext
                 .getSystemService(Context.ACTIVITY_SERVICE);

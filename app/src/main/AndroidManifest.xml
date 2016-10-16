@@ -2,9 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.jianghongkui.volumemanager">
 
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!--<uses-permission android:name="android.permission.RECORD_AUDIO" />-->
+    <!--<uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />-->
+    <!--<uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
 
     <application
         android:name=".other.Application"
@@ -38,17 +38,22 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".other.CallReceiver">
+        <receiver android:name=".other.MessageNotifyReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
-                <action android:name="android.intent.action.PHONE_STATE" />
+                <action android:name="com.action.message_notify" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".other.ServiceStartReceiver">
+        <!--<receiver android:name=".other.CallReceiver">-->
+        <!--<intent-filter>-->
+        <!--<action android:name="android.intent.action.NEW_OUTGOING_CALL" />-->
+        <!--<action android:name="android.intent.action.PHONE_STATE" />-->
+        <!--</intent-filter>-->
+        <!--</receiver>-->
+
+        <receiver android:name=".other.BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.TIME_TICK" />
             </intent-filter>
         </receiver>
 
@@ -68,10 +73,7 @@
         <provider
             android:name=".other.PackageVolumeProvider"
             android:authorities="com.jianghongkui.volumemanager" />
-        <service
-            android:name=".other.AudioRecordService"
-            android:enabled="true"
-            android:exported="true" />
+
         <service
             android:name=".other.VolumeChangeService"
             android:enabled="true">
