@@ -4,7 +4,7 @@ package com.jianghongkui.volumemanager.util;
  * Created by jianghongkui on 2016/9/14.
  */
 public class MLog {
-    private static boolean debug = false;
+    private static boolean debug = true;
 
     public static void e(String tag, String msg) {
         if (debug)

@@ -30,9 +30,11 @@ public class WindowChangeDetectingService extends AccessibilityService {
 
     public static final String Service = Application.PACKAGENAME + "/"
             + WindowChangeDetectingService.class.getPackage().getName() + "." + WindowChangeDetectingService.class.getSimpleName();
-//    private final String ACTION_USER_ADJUST_VOLUME = "com.action.user_adjust_volume";
+    //    private final String ACTION_USER_ADJUST_VOLUME = "com.action.user_adjust_volume";
 //    private final String ACTION_APP_SET_VOLUME = "com.action.app_set_volume";
 //    private final String USER_CHANGE_VOLUME = "android.media.VOLUME_CHANGED_ACTION";
+    private final String SYSTEMUI = "com.android.systemui";
+
 
     private String currentActivityPackageName;
     private String lastActivityPackageName;
@@ -97,7 +99,7 @@ public class WindowChangeDetectingService extends AccessibilityService {
 //            );
             currentActivityPackageName = event.getPackageName().toString();
             MLog.d(TAG, "onAccessibilityEvent currentActivityPackageName:" + currentActivityPackageName);
-            if (!currentActivityPackageName.equals(lastActivityPackageName) && !Settings.list.contains(currentActivityPackageName)) {
+            if (!currentActivityPackageName.equals(lastActivityPackageName) && !SYSTEMUI.equals(currentActivityPackageName)) {
                 Intent intent = new Intent(VolumeChangeService.ACTION_ACTIVITY_CHANGED);
                 intent.putExtra("PackageName", currentActivityPackageName);
                 sendBroadcast(intent);

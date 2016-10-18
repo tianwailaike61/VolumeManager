@@ -27,12 +27,10 @@ public class Settings {
     public static boolean showNotification = true;
     public static boolean allowSelfStart = true;
 
-    public static boolean isMutedModel=false;
+    public static boolean isMutedModel = false;
 
     public static boolean forceChangeMusic = false;
     public static boolean forceChangeVioceCall = false;
-
-    public static boolean userschange=false;
 
     public static List<String> list = new ArrayList<>();
 
@@ -40,7 +38,7 @@ public class Settings {
         list.add("com.android.systemui");
         list.add("com.android.launcher3");
         list.add("com.android.settings");
-        //list.add("com.jianghongkui.volumemanager");
+        list.add("com.jianghongkui.volumemanager");
     }
 
     public static void init(Context context) {

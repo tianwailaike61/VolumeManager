@@ -105,7 +105,6 @@ public class VolumeChangeService extends Service {
 
         Settings.init(context);
 
-        MLog.d(TAG, "" + intent.getAction());
 
         if (Settings.showNotification) {
             startNotification();
@@ -129,7 +128,7 @@ public class VolumeChangeService extends Service {
     private void maybeChangeVolume(String packageName) {
         if (!packageName.equals(Application.PACKAGENAME)) {
             Volume volume = getNextVolume(packageName);
-            if (!isNoVolume && canChange() && volumeEquals(volume)) {
+            if (canChange() && volumeEquals(volume) && !Settings.list.contains(packageName)) {
                 setVolume(getVolumeFromDatabases(packageName));
             }
         }
@@ -361,7 +360,7 @@ public class VolumeChangeService extends Service {
             if (intent.getAction().equals(ACTION_ACTIVITY_CHANGED)) {
                 currentActivityPackageName = intent.getStringExtra("PackageName");
                 MLog.d(TAG, "currentActivityPackageName-" + currentActivityPackageName);
-                if (!Settings.list.contains(currentActivityPackageName) && !currentActivityPackageName.equals(lastActivityPackageName)) {
+                if (!currentActivityPackageName.equals(lastActivityPackageName)) {
                     maybeChangeVolume(currentActivityPackageName);
                     lastActivityPackageName = currentActivityPackageName;
                 }
