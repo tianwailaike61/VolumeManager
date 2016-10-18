@@ -46,6 +46,12 @@ public class VolumeChangeReciver extends BroadcastReceiver {
         } else if (ACTION_USER_CHANGE_VOLUME.equals(action)) {
             if (userschange) {
                 // MLog.d(TAG, "user change the volume");
+                if (Settings.showNotification) {
+                    Intent newIntent = new Intent(VolumeChangeService.ACTION_NOTIFICATION_NO_VOLUME);
+                    newIntent.putExtra("userchange", "true");
+                    newIntent.putExtra("isNoVolume", false);
+                    context.sendBroadcast(newIntent);
+                }
                 if (Settings.saveUserChanges) {
                     Intent intent1 = new Intent();
                     intent1.setAction(WindowChangeDetectingService.UserAdjustVolumeReceiver.

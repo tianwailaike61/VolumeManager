@@ -36,6 +36,7 @@
     <string name="notification_msg_change_volume">%1$s is opening,the volume will be changed</string>
     <string name="notification_msg_change_volume_extra">,excepting %1$s sound</string>
     <string name="notification_msg_save_volume">the volume will be saved into %1$s!</string>
+    <string name="notification_no_volume">you are in no volume model!</string>
 
     <!-- Setting  string -->
     <string name="wait">please wait for a moment!</string>

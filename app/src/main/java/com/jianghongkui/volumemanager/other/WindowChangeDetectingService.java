@@ -40,6 +40,10 @@ public class WindowChangeDetectingService extends AccessibilityService {
     private Context context;
     private VolumeDBManager manager;
 
+    private VolumeChangeReciver volumeChangeReciver;
+    private UserAdjustVolumeReceiver userAdjustVolumeReceiver;
+    private TimeTickReceiver timeTickReceiver;
+
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
@@ -59,21 +63,29 @@ public class WindowChangeDetectingService extends AccessibilityService {
     }
 
     private void initReceiver() {
-        VolumeChangeReciver volumeChangeReciver = new VolumeChangeReciver();
+        volumeChangeReciver = new VolumeChangeReciver();
         IntentFilter filter1 = new IntentFilter();
         filter1.addAction(VolumeChangeReciver.ACTION_USER_CHANGE_VOLUME);
         filter1.addAction(VolumeChangeReciver.ACTION_APP_CHANGE_VOLUME);
         registerReceiver(volumeChangeReciver, filter1);
 
-        UserAdjustVolumeReceiver userAdjustVolumeReceiver = new UserAdjustVolumeReceiver();
+        userAdjustVolumeReceiver = new UserAdjustVolumeReceiver();
         IntentFilter filter2 = new IntentFilter();
         filter2.addAction(UserAdjustVolumeReceiver.ACTION_USER_ADJUST_VOLUME);
         registerReceiver(userAdjustVolumeReceiver, filter2);
 
-        TimeTickReceiver timeTickReceiver = new TimeTickReceiver();
+        timeTickReceiver = new TimeTickReceiver();
         IntentFilter filter3 = new IntentFilter();
         filter3.addAction(Intent.ACTION_TIME_TICK);
         registerReceiver(timeTickReceiver, filter3);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(volumeChangeReciver);
+        unregisterReceiver(userAdjustVolumeReceiver);
+        unregisterReceiver(timeTickReceiver);
     }
 
     @Override
@@ -169,7 +181,7 @@ public class WindowChangeDetectingService extends AccessibilityService {
         }
 
         private void notifyMessage() {
-            MLog.d(TAG,"notifyMessage");
+            MLog.d(TAG, "notifyMessage");
             Intent newIntent = new Intent(MessageNotifyReceiver.ACTION_MESSAGE_NOTIFY);
             Notice notice = new Notice();
             notice.setType(Notice.SAVE_VOLUME);

@@ -70,6 +70,7 @@
     <string name="notification_msg_change_volume">"音量管理为%1$s修改音量"</string>
     <string name="notification_msg_change_volume_extra">"(除了%1$s音量)"</string>
     <string name="notification_msg_save_volume">调节音量将被保存到%1$s!</string>
+    <string name="notification_no_volume">启用静音</string>
 
 
 </resources>

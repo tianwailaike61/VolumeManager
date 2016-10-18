@@ -21,9 +21,12 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
 
 import com.jianghongkui.volumemanager.R;
+import com.jianghongkui.volumemanager.WelcomeActivity;
 import com.jianghongkui.volumemanager.model.Notice;
 import com.jianghongkui.volumemanager.model.Settings;
 import com.jianghongkui.volumemanager.model.Volume;
@@ -48,9 +51,9 @@ public class VolumeChangeService extends Service {
     public static final String ACTION_NOTIFICATION_MASSAFE_CHANGED = "android.action.notification_message_changed";
     public static final String ACTION_NOTIFICATION_NO_VOLUME = "android.action.notification_no_volume";
 
-    private Notification notification;
+    // private Notification notification;
 
-    private final int NOTIFICATION_FLAG = 0;
+    private final int NOTIFICATION_FLAG = 100;
 
     private NotificationReceiver notificationReceiver;
     private ActivityChangedReceiver activityChangedReceiver;
@@ -58,18 +61,17 @@ public class VolumeChangeService extends Service {
     private VolumeDBManager manager;
 
     private boolean isNoVolume = false;
-    private Lock lock;
 
     private String currentActivityPackageName = Application.PACKAGENAME;
     private String lastActivityPackageName;
 
     private Context context;
 
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            updateNotification();
+//    private Handler handler = new Handler() {
+//        @Override
+//        public void handleMessage(Message msg) {
+//            super.handleMessage(msg);
+//            updateNotification();
 //            try {
 //                Thread.sleep(1000);
 //            } catch (InterruptedException e) {
@@ -78,22 +80,16 @@ public class VolumeChangeService extends Service {
 //                MLog.d(TAG, "release lock");
 //                lock.unlock();
 //            }
-        }
-    };
+//        }
+//    };
+
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        context = getApplicationContext();
-
-        Settings.init(context);
-
+    public void onCreate() {
+        super.onCreate();
         activityChangedReceiver = new ActivityChangedReceiver();
         IntentFilter intentFilter1 = new IntentFilter(ACTION_ACTIVITY_CHANGED);
         registerReceiver(activityChangedReceiver, intentFilter1);
-
-//        IntentFilter intentFilter2 = new IntentFilter(MessageNotifyReceiver.ACTION_MESSAGE_NOTIFY);
-//        registerReceiver(new MessageNotifyReceiver(), intentFilter2);
-
 
         notificationReceiver = new NotificationReceiver();
         IntentFilter intentFilter3 = new IntentFilter();
@@ -101,12 +97,27 @@ public class VolumeChangeService extends Service {
         intentFilter3.addAction(ACTION_NOTIFICATION_MASSAFE_CHANGED);
         intentFilter3.addAction(ACTION_NOTIFICATION_NO_VOLUME);
         registerReceiver(notificationReceiver, intentFilter3);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        context = getApplicationContext();
+
+        Settings.init(context);
+
+        MLog.d(TAG, "" + intent.getAction());
 
         if (Settings.showNotification) {
             startNotification();
         }
-
         return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(activityChangedReceiver);
+        unregisterReceiver(notificationReceiver);
     }
 
     @Nullable
@@ -184,7 +195,7 @@ public class VolumeChangeService extends Service {
 
     private boolean canChange() {
         int ringerMode = Utils.getRingerMode(getApplicationContext());
-        if (ringerMode == AudioManager.RINGER_MODE_SILENT) {
+        if (ringerMode == AudioManager.RINGER_MODE_SILENT || isNoVolume) {
             return false;
         }
         return true;
@@ -224,34 +235,56 @@ public class VolumeChangeService extends Service {
     }
 
 
-    @TargetApi(16)
     public void startNotification() {
+        startForeground(NOTIFICATION_FLAG, getNotification(null, null));
+//        NotificationManager manager = (NotificationManager) getSystemService(
+//                Context.NOTIFICATION_SERVICE);
+//        manager.notify(NOTIFICATION_FLAG, getNotification(null, null));
+    }
+
+    private Notification getNotification(String msg, Bitmap bitmap) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setOngoing(true);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_notification);
         remoteViews.setImageViewResource(R.id.icon_iv, R.mipmap.ic_launcher);
-        setImageView(remoteViews);
+        if (bitmap != null) {
+            remoteViews.setImageViewBitmap(R.id.close_volume, bitmap);
+        } else {
+            remoteViews.setImageViewBitmap(R.id.close_volume, getImageView());
+        }
         remoteViews.setTextViewText(R.id.notification_state, context.getString(R.string.notification_title));
         remoteViews.setTextViewText(R.id.notification_msg, "");
-        int requestCode = (int) SystemClock.uptimeMillis();
-        Intent intent = new Intent(ACTION_NOTIFICATION_NO_VOLUME);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        remoteViews.setOnClickPendingIntent(R.id.close_volume, pendingIntent);
+        if (!TextUtils.isEmpty(msg))
+            remoteViews.setTextViewText(R.id.notification_msg, msg);
+        setClickIntent(remoteViews);
 
         builder.setSmallIcon(R.mipmap.ic_launcher);
 
-        notification = builder.build();
+        Notification notification = builder.build();
+        Intent intent = new Intent(context, WelcomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        notification.contentIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        if (!TextUtils.isEmpty(msg)) {
+            notification.tickerText = msg;
+        }
 
         if (android.os.Build.VERSION.SDK_INT >= 16) {
             notification = builder.build();
             notification.bigContentView = remoteViews;
         }
         notification.contentView = remoteViews;
-        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(NOTIFICATION_FLAG, notification);
+        return notification;
+    }
 
-        lock = new ReentrantLock();
+    private void setClickIntent(RemoteViews remoteViews) {
+        // int requestCode = (int) SystemClock.uptimeMillis();
+        Intent intent = new Intent(ACTION_NOTIFICATION_NO_VOLUME);
+        //intent.setClass(context, VolumeChangeService.class);
+        //PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.close_volume, pendingIntent);
     }
 
 //    private void startNotification() {
@@ -270,28 +303,17 @@ public class VolumeChangeService extends Service {
 //        manager.notify(NOTIFICATION_FLAG, notification);
 //    }
 
-    private void setImageView(RemoteViews remoteViews) {
+    private Bitmap getImageView() {
         int resourceId = R.drawable.volume_full;
-        MLog.d(TAG, "setImageView isNoVolume:" + isNoVolume);
+        MLog.d(TAG, "getImageView isNoVolume:" + isNoVolume);
         if (isNoVolume)
             resourceId = R.drawable.volume_muted;
         Bitmap bitmap = Utils.drawableToBitamp(getResources().getDrawable(resourceId), 70, 70);
-        remoteViews.setImageViewBitmap(R.id.close_volume, bitmap);
+        return bitmap;
     }
 
     private void stopNotification() {
-        NotificationManager manager = (NotificationManager) getSystemService(
-                Context.NOTIFICATION_SERVICE);
-        manager.cancel(NOTIFICATION_FLAG);
-        lock = null;
-    }
-
-    private void updateNotification() {
-        MLog.d(TAG, "updateNotification");
-        NotificationManager manager = (NotificationManager) getSystemService(
-                Context.NOTIFICATION_SERVICE);
-        manager.notify(NOTIFICATION_FLAG, notification);
-
+        stopForeground(true);
     }
 
     private void setVolumeModel(boolean ismuted) {
@@ -315,25 +337,23 @@ public class VolumeChangeService extends Service {
                     stopNotification();
                 }
             } else if (ACTION_NOTIFICATION_MASSAFE_CHANGED.equals(action) && Settings.showNotification) {
-//                MLog.d(TAG, "ACTION_NOTIFICATION_MASSAFE_CHANGED");
-//                lock.lock();
-//                MLog.d(TAG, "get lock");
-                String msg = intent.getStringExtra("Message");
-                if (notification == null)
-                    startNotification();
-                notification.tickerText = msg;
-                notification.contentView.setTextViewText(R.id.notification_msg, msg);
-                updateNotification();
-
+                synchronized (this) {
+                    String msg = intent.getStringExtra("Message");
+                    startForeground(NOTIFICATION_FLAG, getNotification(msg, null));
+                }
             } else if (ACTION_NOTIFICATION_NO_VOLUME.equals(action)) {
-                isNoVolume = !isNoVolume;
-                setImageView(notification.contentView);
+                String str = intent.getStringExtra("userchange");
+                if (str == null) {
+                    isNoVolume = !isNoVolume;
+                } else {
+                    isNoVolume = intent.getBooleanExtra("isNoVolume", false);
+                }
+                String msg = isNoVolume ? getString(R.string.notification_no_volume) : null;
                 setVolumeModel(isNoVolume);
-                updateNotification();
+                startForeground(NOTIFICATION_FLAG, getNotification(msg, getImageView()));
             }
         }
     }
-
 
     public class ActivityChangedReceiver extends BroadcastReceiver {
         @Override
